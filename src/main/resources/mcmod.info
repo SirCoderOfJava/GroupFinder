@@ -1,0 +1,16 @@
+[
+{
+  "modid": "groupfindermod",
+  "name": "Group Finder Mod",
+  "description": "Hypixel mod for finding groups of all types.",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["SirCoderOfJava"],
+  "credits": "people on discord",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
