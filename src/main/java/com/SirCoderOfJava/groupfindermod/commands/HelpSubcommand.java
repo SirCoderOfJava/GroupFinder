@@ -12,6 +12,6 @@ public class HelpSubcommand implements SubcommandAction{
     }
 
     public void execute() {
-        Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(replaceCodes("&6&lTest Help Message")));
+        Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(replaceCodes("&6&lUse &r&c/groupfinder&6&l to get started")));
     }
 }
