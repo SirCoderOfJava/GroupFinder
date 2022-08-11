@@ -5,9 +5,12 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.GlStateManager;
 
+import static com.SirCoderOfJava.groupfindermod.util.ChatMessageColorizer.replaceCodes;
+
 public abstract class GroupFinderButton extends GuiButton {
 
     FontRenderer fontRendererObj;
+
     public GroupFinderButton(int buttonId, int x, int y, int widthIn, int heightIn, String buttonText, FontRenderer fontRenderer) {
         super(buttonId, x, y, widthIn, heightIn, buttonText);
         fontRendererObj = fontRenderer;
@@ -24,17 +27,16 @@ public abstract class GroupFinderButton extends GuiButton {
             GlStateManager.enableAlpha();
             GlStateManager.enableBlend();
             GlStateManager.translate(xPosition, yPosition, 0);
-            drawRect(0, 0, width, height, 0xFF0000FF);
+            drawRect(0, 0, width, height, 0x80000000);
             if(hovered) {
-                fontRendererObj.drawStringWithShadow(displayString, 5, 4, 0xFF00FFFF);
+                fontRendererObj.drawStringWithShadow(replaceCodes("&c" + displayString), 5, 4, 0xFFFFFFFF);
             }else{
-                fontRendererObj.drawString(displayString, 5, 4, 0xFF00FFFF);
+                fontRendererObj.drawString(displayString, 5, 4, 0xFFFFFFFF);
             }
-            int color = hovered ? 0xFF00FFFF : 0xFF000000;
-            drawHorizontalLine(0, width, 0, color);
-            drawHorizontalLine(0, width, height, color);
-            drawVerticalLine(0, 0, height, color);
-            drawVerticalLine(width, 0, height, color);
+            drawHorizontalLine(0, width, 0, 0xFF000000);
+            drawHorizontalLine(0, width, height, 0xFF000000);
+            drawVerticalLine(0, 0, height, 0xFF000000);
+            drawVerticalLine(width, 0, height, 0xFF000000);
         }
         GlStateManager.popMatrix();
     }

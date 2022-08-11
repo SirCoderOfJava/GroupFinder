@@ -16,7 +16,7 @@ public class GetGroupsSubcommand implements SubcommandAction {
     public void execute() {
         GFHttpRequestHandler requestHandler = new GFHttpRequestHandler(Minecraft.getMinecraft().thePlayer.getName());
         try {
-            JsonObject groups = groups = requestHandler.getGroups();
+            JsonObject groups = requestHandler.getGroups();
             Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(groups.toString()));
         } catch (IOException e) {
             e.printStackTrace();
