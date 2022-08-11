@@ -8,6 +8,7 @@ work in progress
 
 ## To Do:
 - Settings file
+- Filter thingy for groups
 - ~~Make gui look nicer~~
 - ~~Format group list json data~~
 - Gui to send POST request / create group
