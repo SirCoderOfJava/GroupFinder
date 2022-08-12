@@ -14,6 +14,7 @@ import java.util.List;
 
 public class PageHandler {
 
+    public static final int MAX_GROUPS_PER_PAGE = 9;
     ArrayList<JsonObject> groups;
     GroupInfoParser parser;
     GFHttpRequestHandler handler;
@@ -49,7 +50,7 @@ public class PageHandler {
         int numPages = getNumberOfPages();
         for (int i = 0; i < numPages; i++) {
             ArrayList<JsonObject> page = new ArrayList<JsonObject>();
-            for (int j = 0; (j < 9 && currentGroupListReaderPos < groups.size()); j++) {
+            for (int j = 0; (j < MAX_GROUPS_PER_PAGE && currentGroupListReaderPos < groups.size()); j++) {
                 page.add(groups.get(currentGroupListReaderPos));
                 currentGroupListReaderPos++;
             }
@@ -93,7 +94,7 @@ public class PageHandler {
     }
 
     public int getNumberOfPages() {
-        return (int) Math.ceil((float) groups.size() / 9F);
+        return (int) Math.ceil((float) groups.size() / (float) MAX_GROUPS_PER_PAGE);
     }
 
 

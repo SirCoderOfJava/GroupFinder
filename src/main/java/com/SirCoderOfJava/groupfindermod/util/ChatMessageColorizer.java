@@ -1,5 +1,6 @@
 package com.SirCoderOfJava.groupfindermod.util;
 
+//Black magic code from the hypixel forums
 public class ChatMessageColorizer {
     public static final char COLOUR_CHAR = '\u00A7';
 

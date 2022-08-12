@@ -16,12 +16,17 @@ import static com.SirCoderOfJava.groupfindermod.util.ChatMessageColorizer.replac
 
 public class GroupFinderGui extends GuiScreen {
 
-    final int CLOSEBUTTONID = 0;
-    final int REFRESHBUTTONID = 1;
-    final int INCREMENTPAGEBUTTONID = 100;
-    final int DECREMENTPAGEBUTTONID = 101;
+    final int CLOSE_BUTTON_ID = 0;
+    final int REFRESH_BUTTON_ID = 1;
+    final int INCREMENT_PAGE_BUTTON_ID = 100;
+    final int DECREMENT_PAGE_BUTTON_ID = 101;
 
-    final int sideBuffer = 5;
+    final int SIDE_BUFFER = 5;
+    private final int VERTICAL_PAGE_TEXT_SHIFT = 34;
+    private final int OPAQUE_WHITE = 0xFFFFFFFF;
+    private final int NEW_LINE_Y_INCREMENT = 150;
+    private final int STARTING_GROUP_BUTTON_X_POS = 225;
+    private final int STARTING_GROUP_BUTTON_Y_POS = 50;
 
     public boolean focused = false;
 
@@ -42,7 +47,7 @@ public class GroupFinderGui extends GuiScreen {
             GlStateManager.enableBlend();
             GlStateManager.enableAlpha();
             GlStateManager.scale(titleScaleFactor, titleScaleFactor, titleScaleFactor);
-            drawCenteredString(fontRendererObj, replaceCodes("&cGroup Finder"), (int) (centerX / titleScaleFactor), 5, 0xFFFFFFFF);
+            drawCenteredString(fontRendererObj, replaceCodes("&cGroup Finder"), (int) (centerX / titleScaleFactor), 5, OPAQUE_WHITE);
         }
         GlStateManager.popMatrix();
 
@@ -53,7 +58,7 @@ public class GroupFinderGui extends GuiScreen {
 
             if(!focused) {
                 int numPages = pageHandler.getNumberOfPages();
-                drawCenteredString(fontRendererObj, "Page: " + currentPage + " / " + numPages, centerX, height - 34, 0xFFFFFFFF);
+                drawCenteredString(fontRendererObj, "Page: " + currentPage + " / " + numPages, centerX, height - VERTICAL_PAGE_TEXT_SHIFT, OPAQUE_WHITE);
             }
         }
         GlStateManager.popMatrix();
@@ -92,30 +97,30 @@ public class GroupFinderGui extends GuiScreen {
         pageHandler.update();
 
         buttonList.clear();
-        buttonList.add(new CloseButton(CLOSEBUTTONID, fontRendererObj));
-        buttonList.add(new RefreshGroupsButton(REFRESHBUTTONID, fontRendererObj));
+        buttonList.add(new CloseButton(CLOSE_BUTTON_ID, fontRendererObj));
+        buttonList.add(new RefreshGroupsButton(REFRESH_BUTTON_ID, fontRendererObj));
 
 
         if(!focused) {
-            buttonList.add(new IncrementPageButton(INCREMENTPAGEBUTTONID, width, height, fontRendererObj, this));
-            buttonList.add(new DecrementPageButton(DECREMENTPAGEBUTTONID, width, height, fontRendererObj, this));
+            buttonList.add(new IncrementPageButton(INCREMENT_PAGE_BUTTON_ID, width, height, fontRendererObj, this));
+            buttonList.add(new DecrementPageButton(DECREMENT_PAGE_BUTTON_ID, width, height, fontRendererObj, this));
 
-            int currentButtonXPos = 225;
-            int currentButtonYPos = 50;
+            int currentButtonXPos = STARTING_GROUP_BUTTON_X_POS;
+            int currentButtonYPos = STARTING_GROUP_BUTTON_Y_POS;
 
             int currentButtonID = 2;
 
             ArrayList<JsonObject> page = pageHandler.getPages().get(currentPage - 1);
             for (JsonObject group : page) {
                 List<String> lines = pageHandler.getDisplayLinesFromGroup(group);
-                int projectedButtonEndX = currentButtonXPos + fontRendererObj.getStringWidth(pageHandler.getLongestLineInGroupLines(lines)) + (2 * sideBuffer);
+                int projectedButtonEndX = currentButtonXPos + fontRendererObj.getStringWidth(pageHandler.getLongestLineInGroupLines(lines)) + (2 * SIDE_BUFFER);
                 if (projectedButtonEndX > (width - 200)) {
                     currentButtonXPos = 225;
-                    currentButtonYPos += 150;
+                    currentButtonYPos += NEW_LINE_Y_INCREMENT;
                 }
                 UnfocusedGroupButton button = new UnfocusedGroupButton(currentButtonID, currentButtonXPos, currentButtonYPos, lines, fontRendererObj);
                 buttonList.add(button);
-                currentButtonXPos += button.width + (2 * sideBuffer);
+                currentButtonXPos += button.width + (2 * SIDE_BUFFER);
             }
         }
     }

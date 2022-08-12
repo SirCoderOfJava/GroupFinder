@@ -15,37 +15,35 @@ public class GFHttpRequestHandler {
 
     private static final String baseURL = "http://ec2-54-196-164-144.compute-1.amazonaws.com:5000";
     private String playerName;
+
     public GFHttpRequestHandler(String playerName) {
         this.playerName = playerName;
     }
 
+    //Known issue: this crashes the game when the server is down
     public JsonObject getGroups() throws IOException {
+
+        Gson gson = new Gson();
+
+        URL url = new URL(baseURL + "/grouplist");
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("GET");
+
+
+        StringBuilder responseString = new StringBuilder();
         try {
-            Gson gson = new Gson();
-
-            URL url = new URL(baseURL + "/grouplist");
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("GET");
-
-
-            StringBuilder responseString = new StringBuilder();
-            try {
-                BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                String inputLine;
-                while ((inputLine = in.readLine()) != null) {
-                    responseString.append(inputLine);
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-                Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("[GroupFinder] IOException while reading from /grouplist endpoint"));
+            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            String inputLine;
+            while ((inputLine = in.readLine()) != null) {
+                responseString.append(inputLine);
             }
-
-            return gson.fromJson(responseString.toString(), JsonObject.class);
-        }catch(Exception e) {
+        } catch (IOException e) {
             e.printStackTrace();
-            Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("[GroupFinder] issue connecting to server, try again later"));
-            return null;
+            Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("[GroupFinder] IOException while reading from /grouplist endpoint"));
         }
+
+        return gson.fromJson(responseString.toString(), JsonObject.class);
+
     }
 
 }
