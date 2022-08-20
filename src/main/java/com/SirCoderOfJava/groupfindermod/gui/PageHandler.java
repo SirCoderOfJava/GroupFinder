@@ -2,15 +2,15 @@ package com.SirCoderOfJava.groupfindermod.gui;
 
 import com.SirCoderOfJava.groupfindermod.gfserver.GFHttpRequestHandler;
 import com.SirCoderOfJava.groupfindermod.gfserver.GroupInfoParser;
-
-import static com.SirCoderOfJava.groupfindermod.util.ChatMessageColorizer.replaceCodes;
-
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ChatComponentText;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.SirCoderOfJava.groupfindermod.util.ChatMessageColorizer.replaceCodes;
 
 public class PageHandler {
 
@@ -21,16 +21,24 @@ public class PageHandler {
 
     ArrayList<ArrayList<JsonObject>> pages;
 
+    GroupFilter groupFilter;
+
+    public static final String NO_GROUPS_JSON = "{\"name\": \"No Groups Found\"}";
+
     public PageHandler() {
         groups = new ArrayList<JsonObject>();
         pages = new ArrayList<ArrayList<JsonObject>>();
         parser = new GroupInfoParser();
         handler = new GFHttpRequestHandler(Minecraft.getMinecraft().thePlayer.getName());
+        groupFilter = new GroupFilter();
+
         update();
     }
 
     public void update() {
         //Update groups with call to server
+        //groupFilter.addTextFilter(GroupFilter.FILTER_TYPES.ANY, "testplayer");
+
         groups.clear();
         try {
             groups = parser.parseGroupList(handler.getGroups());
@@ -39,8 +47,12 @@ public class PageHandler {
             Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("houston we have a problem"));
         }
 
-        if(groups == null) {
+        groups = groupFilter.filter(groups);
+
+        if(groups.size() == 0) {
+            Gson gson = new Gson();
             groups = new ArrayList<JsonObject>();
+            groups.add(gson.fromJson(NO_GROUPS_JSON, JsonObject.class));
         }
 
         //update pages
@@ -61,6 +73,11 @@ public class PageHandler {
 
     public List<String> getDisplayLinesFromGroup(JsonObject group) {
         List<String> lines = new ArrayList<String>();
+
+        if(parser.getName(group).equalsIgnoreCase("No Groups Found")) {
+            lines.add(replaceCodes("&cNo Groups Found"));
+            return lines;
+        }
 
         String name = replaceCodes("Group Name: &c") + parser.getName(group);
         String creator = replaceCodes("Group Leader: &c") + parser.getCreator(group);
@@ -91,6 +108,10 @@ public class PageHandler {
             if (line.length() > out.length()) out = line;
         }
         return out;
+    }
+
+    public void addTextFilter(GroupFilter.FILTER_TYPES filterType, String value) {
+        groupFilter.addTextFilter(filterType, value);
     }
 
     public int getNumberOfPages() {

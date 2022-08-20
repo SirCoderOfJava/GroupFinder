@@ -10,7 +10,9 @@ public class GroupInfoParser {
     public ArrayList<JsonObject> parseGroupList(JsonObject groups) {
         ArrayList<JsonObject> outList = new ArrayList<JsonObject>();
         for(JsonElement element : groups.getAsJsonArray("groups")) {
-            outList.add(element.getAsJsonObject());
+            if(!element.getAsJsonObject().getAsJsonPrimitive("name").getAsString().equalsIgnoreCase("00000000")) {
+                outList.add(element.getAsJsonObject());
+            }
         }
         return outList;
     }
@@ -42,6 +44,17 @@ public class GroupInfoParser {
     public String getName(JsonObject group) {
         if(!group.has("name")) return null;
         return group.getAsJsonPrimitive("name").getAsString();
+    }
+
+    public ArrayList<String> getAllStringProperties(JsonObject group) {
+        ArrayList<String> outlist = new ArrayList<String>();
+        if(getName(group) != null) outlist.add(getName(group));
+        if(getMembers(group) != null) outlist.addAll(getMembers(group));
+        if(getSubCategory(group) != null) outlist.add(getSubCategory(group));
+        if(getCategory(group) != null) outlist.add(getCategory(group));
+        if(getCreator(group) != null) outlist.add(getCreator(group));
+
+        return outlist;
     }
 
 }
