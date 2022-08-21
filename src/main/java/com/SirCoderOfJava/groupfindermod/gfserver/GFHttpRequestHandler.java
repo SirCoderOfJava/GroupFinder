@@ -13,14 +13,26 @@ import java.net.URL;
 
 public class GFHttpRequestHandler {
 
+    //URL for the server
     private static final String baseURL = "http://ec2-54-196-164-144.compute-1.amazonaws.com:5000";
     private String playerName;
+
+    /**
+     * Constructors take the playernames for potential validation purposes.
+     */
+    public GFHttpRequestHandler() {
+        this.playerName = Minecraft.getMinecraft().thePlayer.getName();
+    }
 
     public GFHttpRequestHandler(String playerName) {
         this.playerName = playerName;
     }
 
-    //Known issue: this crashes the game when the server is down
+
+    /**
+     * @return {@link JsonObject} from the server's {@code /grouplist} endpoint
+     * @throws IOException
+     */
     public JsonObject getGroups() throws IOException {
 
         Gson gson = new Gson();

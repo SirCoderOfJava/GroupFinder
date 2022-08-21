@@ -3,6 +3,11 @@ package com.SirCoderOfJava.groupfindermod.gui.buttons;
 import com.SirCoderOfJava.groupfindermod.gui.GroupFinderGui;
 import net.minecraft.client.gui.FontRenderer;
 
+
+/**
+ * Navigator button to increment the page number
+ * @see DecrementPageButton
+ */
 public class IncrementPageButton extends GroupFinderButton {
 
     public static final int EXTRA_RIGHT_SHIFT = 5;

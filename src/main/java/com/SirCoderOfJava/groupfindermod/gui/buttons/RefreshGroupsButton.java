@@ -4,6 +4,10 @@ import com.SirCoderOfJava.groupfindermod.gfserver.GFHttpRequestHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 
+/**
+ * Standard button to refresh the gui
+ * @see CloseButton
+ */
 public class RefreshGroupsButton extends GroupFinderButton {
 
     public static final int X_POSITION = 110;
@@ -16,7 +20,11 @@ public class RefreshGroupsButton extends GroupFinderButton {
         super(buttonId, X_POSITION, Y_POSITION, WIDTH, HEIGHT, "Refresh", fontRenderer);
         requestHandler = new GFHttpRequestHandler(Minecraft.getMinecraft().thePlayer.getName());
     }
+
+    /**
+     * Isn't currently needed as implementation is in {@link com.SirCoderOfJava.groupfindermod.gui.GroupFinderGui}
+     */
     public void runClickAction() {
-        //GroupFinderGui.pageHandler.update();
+
     }
 }

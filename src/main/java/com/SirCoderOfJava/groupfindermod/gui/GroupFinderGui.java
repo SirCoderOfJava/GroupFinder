@@ -16,6 +16,9 @@ import java.util.List;
 
 import static com.SirCoderOfJava.groupfindermod.util.ChatMessageColorizer.replaceCodes;
 
+/**
+ * Main Gui for the group display
+ */
 public class GroupFinderGui extends GuiScreen {
 
     final int CLOSE_BUTTON_ID = 0;
@@ -47,6 +50,9 @@ public class GroupFinderGui extends GuiScreen {
 
     private NameFilterTextField nameFilterTextField;
 
+    /**
+     * Runs every time the gui is loaded or resized: Resets the text fields, page handlers, and updates all the buttons on the screen
+     */
     @Override
     public void initGui() {
         textFields = new ArrayList<GroupFinderTextField>();
@@ -61,6 +67,12 @@ public class GroupFinderGui extends GuiScreen {
         super.initGui();
     }
 
+    /**
+     * Rendering function for the gui
+     * @param mouseX x coordinate of the mouse
+     * @param mouseY y coordinate of the mouse
+     * @param partialTicks partial ticks, not needed for our rendering but must be passed to superclass
+     */
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         int centerX = width / 2;
@@ -72,9 +84,12 @@ public class GroupFinderGui extends GuiScreen {
         GlStateManager.pushMatrix();
         {
             float titleScaleFactor = 2.0F;
-            GlStateManager.enableBlend();
+            //enable transparent rendering
             GlStateManager.enableAlpha();
+            //increase rendering scale for title
             GlStateManager.scale(titleScaleFactor, titleScaleFactor, titleScaleFactor);
+            //Draw the title
+            //Opaque white color allows color codes to work normally
             drawCenteredString(fontRendererObj, replaceCodes("&cGroup Finder"), (int) (centerX / titleScaleFactor), 5, OPAQUE_WHITE);
         }
         GlStateManager.popMatrix();
@@ -83,12 +98,9 @@ public class GroupFinderGui extends GuiScreen {
         GlStateManager.pushMatrix();
         {
             GlStateManager.enableAlpha();
-            GlStateManager.enableBlend();
 
-            if(!focused) {
-                int numPages = pageHandler.getNumberOfPages();
-                drawCenteredString(fontRendererObj, "Page: " + currentPage + " / " + numPages, centerX, height - VERTICAL_PAGE_TEXT_SHIFT, OPAQUE_WHITE);
-            }
+            int numPages = pageHandler.getNumberOfPages();
+            drawCenteredString(fontRendererObj, "Page: " + currentPage + " / " + numPages, centerX, height - VERTICAL_PAGE_TEXT_SHIFT, OPAQUE_WHITE);
         }
         GlStateManager.popMatrix();
 
@@ -96,41 +108,59 @@ public class GroupFinderGui extends GuiScreen {
         GlStateManager.pushMatrix();
         {
             GlStateManager.enableAlpha();
-            GlStateManager.enableBlend();
+
+            //translate renderer to upper left corner of the rendering block
             GlStateManager.translate(FILTER_X_OFFSET, FILTER_Y_OFFSET, 0);
 
-            if(!focused) {
-                drawRect(0, 0, FILTER_WIDTH, FILTER_HEIGHT, HALF_TRANSPARENT_BLACK);
-                drawHorizontalLine(0, FILTER_WIDTH, 0, OPAQUE_BLACK);
-                drawHorizontalLine(0, FILTER_WIDTH, FILTER_HEIGHT, OPAQUE_BLACK);
-                drawVerticalLine(0, 0, FILTER_HEIGHT, OPAQUE_BLACK);
-                drawVerticalLine(FILTER_WIDTH, 0, FILTER_HEIGHT, OPAQUE_BLACK);
-            }
+            //Draw background of filter
+            drawRect(0, 0, FILTER_WIDTH, FILTER_HEIGHT, HALF_TRANSPARENT_BLACK);
+
+            //Draw filter outline
+            drawHorizontalLine(0, FILTER_WIDTH, 0, OPAQUE_BLACK);
+            drawHorizontalLine(0, FILTER_WIDTH, FILTER_HEIGHT, OPAQUE_BLACK);
+            drawVerticalLine(0, 0, FILTER_HEIGHT, OPAQUE_BLACK);
+            drawVerticalLine(FILTER_WIDTH, 0, FILTER_HEIGHT, OPAQUE_BLACK);
         }
         GlStateManager.popMatrix();
 
         //Text Box Rendering block
         GlStateManager.pushMatrix();
         {
+            //Draw labels for the text fields
             drawString(fontRendererObj, "Name Filter:", 15, 55, OPAQUE_WHITE);
-            nameFilterTextField.drawTextBox();
+
+            //Draw all the text boxes
+            for(GroupFinderTextField textField : textFields) {
+                textField.drawTextBox();
+            }
         }
         GlStateManager.popMatrix();
 
         super.drawScreen(mouseX, mouseY, partialTicks);
     }
 
+    /**
+     * Runs whenever a button is clicked
+     * @param button the button that was clicked
+     * @throws IOException
+     */
     @Override
     protected void actionPerformed(GuiButton button) throws IOException {
         for(GuiButton b : buttonList) {
+            //If they clicked the refresh button, update all the filters
             if(b instanceof RefreshGroupsButton && b.id == button.id) {
                 pageHandler.groupFilter.clearTextFilters();
                 for(GroupFinderTextField textField : textFields) {
                     textField.updateFilter();
                 }
             }
+
+            //Process all group finder buttons
             if(b instanceof GroupFinderButton && b.id == button.id) {
+                //run their built-in action method
                 ((GroupFinderButton) button).runClickAction();
+
+                //update the buttons after a small delay
                 new TickDelay(new Runnable() {
                     @Override
                     public void run() {
@@ -138,7 +168,9 @@ public class GroupFinderGui extends GuiScreen {
                     }
                 }, 1);
                 break;
+
             }else if(b instanceof UnfocusedGroupButton && b.id == button.id) {
+                //If they clicked on one of the previews, expand the preview
                 ((UnfocusedGroupButton) button).expand();
             }
 
@@ -147,36 +179,46 @@ public class GroupFinderGui extends GuiScreen {
     }
 
 
-
+    /**
+     * Update all the buttons
+     */
     public void updateButtons() {
+        //update all the group info and the pages for previews
         pageHandler.update();
 
+        //clear the button list and repopulate with static buttons
         buttonList.clear();
         buttonList.add(new CloseButton(CLOSE_BUTTON_ID, fontRendererObj));
         buttonList.add(new RefreshGroupsButton(REFRESH_BUTTON_ID, fontRendererObj));
+        buttonList.add(new IncrementPageButton(INCREMENT_PAGE_BUTTON_ID, width, height, fontRendererObj, this));
+        buttonList.add(new DecrementPageButton(DECREMENT_PAGE_BUTTON_ID, width, height, fontRendererObj, this));
 
+        //Populate group previews
 
-        if(!focused) {
-            buttonList.add(new IncrementPageButton(INCREMENT_PAGE_BUTTON_ID, width, height, fontRendererObj, this));
-            buttonList.add(new DecrementPageButton(DECREMENT_PAGE_BUTTON_ID, width, height, fontRendererObj, this));
+        int currentButtonXPos = STARTING_GROUP_BUTTON_X_POS;
+        int currentButtonYPos = STARTING_GROUP_BUTTON_Y_POS;
 
-            int currentButtonXPos = STARTING_GROUP_BUTTON_X_POS;
-            int currentButtonYPos = STARTING_GROUP_BUTTON_Y_POS;
+        int currentButtonID = 2;
 
-            int currentButtonID = 2;
+        //generate current page
+        ArrayList<JsonObject> page = pageHandler.getPages().get(currentPage - 1);
+        for (JsonObject group : page) {
+            //get display lines
+            List<String> lines = pageHandler.getDisplayLinesFromGroup(group);
 
-            ArrayList<JsonObject> page = pageHandler.getPages().get(currentPage - 1);
-            for (JsonObject group : page) {
-                List<String> lines = pageHandler.getDisplayLinesFromGroup(group);
-                int projectedButtonEndX = currentButtonXPos + fontRendererObj.getStringWidth(pageHandler.getLongestLineInGroupLines(lines)) + (2 * SIDE_BUFFER);
-                if (projectedButtonEndX > (width - 200)) {
-                    currentButtonXPos = 225;
-                    currentButtonYPos += NEW_LINE_Y_INCREMENT;
-                }
-                UnfocusedGroupButton button = new UnfocusedGroupButton(currentButtonID, currentButtonXPos, currentButtonYPos, lines, fontRendererObj);
-                buttonList.add(button);
-                currentButtonXPos += button.width + (2 * SIDE_BUFFER);
+            //calculate projected end of the button, and reset to the left side on the next line if it goes past the allocated area
+            int projectedButtonEndX = currentButtonXPos + fontRendererObj.getStringWidth(pageHandler.getLongestLineInGroupLines(lines)) + (2 * SIDE_BUFFER);
+            if (projectedButtonEndX > (width - 200)) {
+                currentButtonXPos = 225;
+                currentButtonYPos += NEW_LINE_Y_INCREMENT;
             }
+
+            //create the actual preview button and add it to the list
+            UnfocusedGroupButton button = new UnfocusedGroupButton(currentButtonID, currentButtonXPos, currentButtonYPos, lines, fontRendererObj);
+            buttonList.add(button);
+
+            //increment to next button slot
+            currentButtonXPos += button.width + (2 * SIDE_BUFFER);
         }
     }
 
@@ -195,6 +237,9 @@ public class GroupFinderGui extends GuiScreen {
         updateButtons();
     }
 
+    /**
+     * Process key presses in text boxes
+     */
     @Override
     protected void keyTyped(char charTyped, int keyCode) throws IOException {
         for(GroupFinderTextField textField : textFields) {
@@ -207,12 +252,20 @@ public class GroupFinderGui extends GuiScreen {
         super.keyTyped(charTyped, keyCode);
     }
 
+    /**
+     * Update cursor counter for text fields
+     */
     @Override
     public void updateScreen() {
         super.updateScreen();
-        nameFilterTextField.updateCursorCounter();
+        for(GroupFinderTextField textField : textFields) {
+            textField.updateCursorCounter();
+        }
     }
 
+    /**
+     * Process mouse clicks in text fields
+     */
     @Override
     protected void mouseClicked(int mouseX, int mouseY, int btn) throws IOException {
         super.mouseClicked(mouseX, mouseY, btn);

@@ -4,7 +4,9 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
-//Code from the cowlection mod
+/**
+ * Used to run a task after a certain delay. Code from the Cowlection mod.
+ */
 public class TickDelay {
     private final Runnable task;
     private int waitingTicks;
