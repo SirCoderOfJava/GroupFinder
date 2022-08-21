@@ -41,8 +41,6 @@ public class GroupFinderGui extends GuiScreen {
     private final int FILTER_WIDTH = 190;
     private int FILTER_HEIGHT = height - 2 * FILTER_Y_OFFSET;
 
-    public boolean focused = false;
-
     public static PageHandler pageHandler;
     private int currentPage = 1;
 
